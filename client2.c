@@ -76,7 +76,6 @@ int main(int argc, char *argv[])
 	}
 	printf("connecting to the server...\n");
 	char buf[BUFSIZE] = { 0xff, 0x00, 0x00, 0x00, 0xff };
-	char backbuf[BUFSIZE] = { 0xff, 0x00, 0x00, 0x00, 0xff };
 	while (1)
 	{
 		if ((z = read(sockfd, buf, sizeof buf)) > 0)//读取传输的数据，返回数据长度
@@ -89,11 +88,11 @@ int main(int argc, char *argv[])
 				{
 					switch (buf[2])
 					{
-					case 0x01:MOTOR_GO_FORWARD; printf("forward\n"); backbuf = "go forward"; break;
-					case 0x02:MOTOR_GO_BACK;    printf("back\n"); backbuf = "go back"; break;
-					case 0x03:MOTOR_GO_LEFT;    printf("left\n"); backbuf = "go left"; break;
-					case 0x04:MOTOR_GO_RIGHT;   printf("right\n"); backbuf = "go right"; break;
-					case 0x00:MOTOR_GO_STOP;    printf("stop\n"); backbuf = "go stop"; break;
+					case 0x01:MOTOR_GO_FORWARD; printf("forward\n"); break;
+					case 0x02:MOTOR_GO_BACK;    printf("back\n");  break;
+					case 0x03:MOTOR_GO_LEFT;    printf("left\n");  break;
+					case 0x04:MOTOR_GO_RIGHT;   printf("right\n");  break;
+					case 0x00:MOTOR_GO_STOP;    printf("stop\n");  break;
 					default: break;
 					}
 					digitalWrite(3, HIGH);
@@ -110,11 +109,11 @@ int main(int argc, char *argv[])
 				{
 					switch (buf[3])
 					{
-					case 0x01:MOTOR_GO_FORWARD; printf("forward\n"); backbuf = "go forward"; break;
-					case 0x02:MOTOR_GO_BACK;    printf("back\n"); backbuf = "go back"; break;
-					case 0x03:MOTOR_GO_LEFT;    printf("left\n"); backbuf = "go left"; break;
-					case 0x04:MOTOR_GO_RIGHT;   printf("right\n"); backbuf = "go right"; break;
-					case 0x00:MOTOR_GO_STOP;    printf("stop\n"); backbuf = "go stop"; break;
+					case 0x01:MOTOR_GO_FORWARD; printf("forward\n");  break;
+					case 0x02:MOTOR_GO_BACK;    printf("back\n");  break;
+					case 0x03:MOTOR_GO_LEFT;    printf("left\n");  break;
+					case 0x04:MOTOR_GO_RIGHT;   printf("right\n");  break;
+					case 0x00:MOTOR_GO_STOP;    printf("stop\n");  break;
 					default: break;
 					}
 					digitalWrite(3, HIGH);
@@ -142,7 +141,6 @@ int main(int argc, char *argv[])
 			printf("read error");
 			continue;
 		}
-		write(sockfd, backbuf, strlen(backbuf));
 	}
 	close(sockfd);
 	return 0;
