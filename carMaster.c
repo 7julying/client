@@ -14,7 +14,7 @@
 #include <time.h>
 #include <wiringPi.h>
 
-#define BUFSIZE 512 //缓冲区大小
+#define BUFSIZE 5 //缓冲区大小
 #define RIGHT 26 //传感器output接在GPIO.26
 
 //通过定义四个电机的状态定义小车状态
@@ -83,56 +83,49 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	printf("connecting to the server...\n");
-	char buf[BUFSIZE] = { 0xff, 0x00, 0x00, 0x00, 0xff }; //定义并初始化读空间
-	char backbuf[BUFSIZE] = { 0xff, 0x00, 0x00, 0x00, 0xff }; //定义并初始化写空间
-    int obstacle;//定义状态接收传感器输出状态
+	char buf[BUFSIZE]; //定义并初始化读空间
+	char backbuf[BUFSIZE]; //定义并初始化写空间
+	memset(buf, 0, BUFSIZE);
+	memset(backbuf, 0, BUFSIZE);
+    int obstacleFlag=0;//定义状态接收传感器输出状态
+	int obstacle;
 	fcntl(sockfd,F_SETFL,fcntl(sockfd,F_GETFL,0)|O_NONBLOCK);//将套接字设置为非阻塞模式
 	while (1)
-	{
-	obstacle = digitalRead(RIGHT);
+	{	
 	//小车遇到障碍，GPIO.26输出低电平，头车将状态返回给服务器
+	if (obstacleFlag = 0)
+	{
+		obstacle = digitalRead(RIGHT);
 		if (obstacle == LOW)
 		{
-			MOTOR_GO_STOP; printf("obstacle\n"); backbuf[0] = 0xff; backbuf[1] = 0x00; 
-			backbuf[2] = 0x00; backbuf[3] = 0x00; backbuf[4] = 0xff;	write(sockfd, backbuf, 5);                     
+			obstacleFlag = 2;
+			MOTOR_GO_STOP;
+			printf("obstacle\n"); 
+			backbuf[1] = 0x05;
+			write(sockfd, backbuf, 5);
+			//usleep(500000);
 		}
+	}		
 		if ((z = read(sockfd, buf, sizeof buf)) > 0)//读取服务器传输的数据，返回数据长度
 		{
-
-			buf[z] = '\0';
-			//通过读入数据决定小车状态，0xff000000ff停止，0xff000100ff前进,0xff000200ff后退,0xff000300ff左转,0xff000400ff右转
 			if (z == 5)
 			{
-				if (buf[1] == 0x00)
+				if (buf[0] == 0x00)
 				{
-					switch (buf[2])
+					switch (buf[1])
 					{
 					case 0x01:MOTOR_GO_FORWARD; printf("forward\n");memcpy(backbuf,buf,sizeof buf);break;
-					case 0x02:MOTOR_GO_BACK;    printf("back\n"); memcpy(backbuf,buf,sizeof buf);break;
+					case 0x02:MOTOR_GO_STOP;    printf("stop\n"); memcpy(backbuf,buf,sizeof buf);break;
 					case 0x03:MOTOR_GO_LEFT;    printf("left\n"); memcpy(backbuf,buf,sizeof buf); break;
 					case 0x04:MOTOR_GO_RIGHT;   printf("right\n"); memcpy(backbuf,buf,sizeof buf); break;
-					case 0x00:MOTOR_GO_STOP;    printf("stop\n"); memcpy(backbuf,buf,sizeof buf); break;
 					default: break;
+					}
+					if (obstacleFlag)
+					{
+						obstacleFlag = obstacleFlag - 1;
 					}
 					digitalWrite(3, HIGH);
 					write(sockfd, backbuf, 5);//头车将信息返回给服务器
-				}
-			}
-			else if (z == 6)
-			{
-				if (buf[2] == 0x00)
-				{
-					switch (buf[3])
-					{
-					case 0x01:MOTOR_GO_FORWARD; printf("forward\n"); memcpy(backbuf,buf,sizeof buf);break;
-					case 0x02:MOTOR_GO_BACK;    printf("back\n"); memcpy(backbuf,buf,sizeof buf); break;
-					case 0x03:MOTOR_GO_LEFT;    printf("left\n"); memcpy(backbuf,buf,sizeof buf); break;
-					case 0x04:MOTOR_GO_RIGHT;   printf("right\n"); memcpy(backbuf,buf,sizeof buf); break;
-					case 0x00:MOTOR_GO_STOP;    printf("stop\n"); memcpy(backbuf,buf,sizeof buf); break;
-					default: break;
-					}
-					digitalWrite(3, HIGH);
-					write(sockfd, backbuf, 5);						
 				}
 			}
 		}

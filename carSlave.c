@@ -13,7 +13,7 @@
 #include <time.h>
 #include <wiringPi.h>
 
-#define BUFSIZE 512
+#define BUFSIZE 5
 
 #define MOTOR_GO_FORWARD   digitalWrite(1,HIGH);digitalWrite(4,LOW);digitalWrite(5,HIGH);digitalWrite(6,LOW)
 #define MOTOR_GO_BACK	   digitalWrite(4,HIGH);digitalWrite(1,LOW);digitalWrite(6,HIGH);digitalWrite(5,LOW)
@@ -75,24 +75,22 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	printf("connecting to the server...\n");
-	char buf[BUFSIZE] = { 0xff, 0x00, 0x00, 0x00, 0xff };
+	char buf[BUFSIZE];
+	memset(buf, 0, BUFSIZE);
 	while (1)
 	{
 		if ((z = read(sockfd, buf, sizeof buf)) > 0)//读取传输的数据，返回数据长度
 		{
-
-			buf[z] = '\0';
 			if (z == 5)
 			{
-				if (buf[1] == 0x00)
+				if (buf[0] == 0x00)
 				{
-					switch (buf[2])
+					switch (buf[1])
 					{
 					case 0x01:MOTOR_GO_FORWARD; printf("forward\n"); break;
-					case 0x02:MOTOR_GO_BACK;    printf("back\n");  break;
+					case 0x02:MOTOR_GO_STOP;    printf("stop\n");  break;
 					case 0x03:MOTOR_GO_LEFT;    printf("left\n");  break;
 					case 0x04:MOTOR_GO_RIGHT;   printf("right\n");  break;
-					case 0x00:MOTOR_GO_STOP;    printf("stop\n");  break;
 					default: break;
 					}
 					digitalWrite(3, HIGH);
@@ -102,34 +100,7 @@ int main(int argc, char *argv[])
 					digitalWrite(3, LOW);
 					MOTOR_GO_STOP;
 				}
-			}
-			else if (z == 6)
-			{
-				if (buf[2] == 0x00)
-				{
-					switch (buf[3])
-					{
-					case 0x01:MOTOR_GO_FORWARD; printf("forward\n");  break;
-					case 0x02:MOTOR_GO_BACK;    printf("back\n");  break;
-					case 0x03:MOTOR_GO_LEFT;    printf("left\n");  break;
-					case 0x04:MOTOR_GO_RIGHT;   printf("right\n");  break;
-					case 0x00:MOTOR_GO_STOP;    printf("stop\n");  break;
-					default: break;
-					}
-					digitalWrite(3, HIGH);
-				}
-				else
-				{
-					digitalWrite(3, LOW);
-					MOTOR_GO_STOP;
-				}
-			}
-			else
-			{
-				digitalWrite(3, LOW);
-				MOTOR_GO_STOP;
-			}
-
+			}	
 		}
 		else if (z == 0)
 		{
