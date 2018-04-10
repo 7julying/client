@@ -15,11 +15,11 @@
 
 #define BUFSIZE 5
 
-#define MOTOR_GO_FORWARD   digitalWrite(1,HIGH);digitalWrite(4,LOW);digitalWrite(5,HIGH);digitalWrite(6,LOW)
-#define MOTOR_GO_BACK	   digitalWrite(4,HIGH);digitalWrite(1,LOW);digitalWrite(6,HIGH);digitalWrite(5,LOW)
-#define MOTOR_GO_RIGHT	   digitalWrite(1,HIGH);digitalWrite(4,LOW);digitalWrite(6,HIGH);digitalWrite(5,LOW)
-#define MOTOR_GO_LEFT	   digitalWrite(4,HIGH);digitalWrite(1,LOW);digitalWrite(5,HIGH);digitalWrite(6,LOW)
-#define MOTOR_GO_STOP	   digitalWrite(1, LOW);digitalWrite(4,LOW);digitalWrite(5, LOW);digitalWrite(6,LOW)
+#define MOTOR_GO_FORWARD   softPwmWrite(4, 0);softPwmWrite(1, 51);softPwmWrite(6, 0);softPwmWrite(5, 51);
+//#define MOTOR_GO_BACK	   digitalWrite(4,HIGH);digitalWrite(1,LOW);digitalWrite(6,HIGH);digitalWrite(5,LOW)
+#define MOTOR_GO_RIGHT	  softPwmWrite(1, 51);softPwmWrite(4, 0);softPwmWrite(5, 0);softPwmWrite(6, 51);
+#define MOTOR_GO_LEFT	   softPwmWrite(4, 51);softPwmWrite(1, 0);softPwmWrite(5, 51);softPwmWrite(6, 0);
+#define MOTOR_GO_STOP	   	softPwmWrite(1, 0); softPwmWrite(4, 0);softPwmWrite(5, 0);softPwmWrite(6, 0);
 
 int main(int argc, char *argv[])
 {
@@ -37,15 +37,12 @@ int main(int argc, char *argv[])
 	pinMode(5, OUTPUT);	//IN3
 	pinMode(6, OUTPUT);	//IN4
 
-	pinMode(3, OUTPUT);	//beed
 
 	/*Init output*/
-	digitalWrite(1, HIGH);
-	digitalWrite(4, HIGH);
-	digitalWrite(5, HIGH);
-	digitalWrite(6, HIGH);
-
-	digitalWrite(1, HIGH);
+	softPwmCreate(1, 1, 100);
+	softPwmCreate(4, 1, 100);
+	softPwmCreate(5, 1, 100);
+	softPwmCreate(6, 1, 100);
 
 	if (argc != 3)
 	{
@@ -93,11 +90,9 @@ int main(int argc, char *argv[])
 					case 0x04:MOTOR_GO_RIGHT;   printf("right\n");  break;
 					default: break;
 					}
-					digitalWrite(3, HIGH);
 				}
 				else
 				{
-					digitalWrite(3, LOW);
 					MOTOR_GO_STOP;
 				}
 			}	
