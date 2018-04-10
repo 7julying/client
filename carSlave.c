@@ -15,10 +15,10 @@
 
 #define BUFSIZE 5
 
-#define MOTOR_GO_FORWARD   softPwmWrite(4, 0);softPwmWrite(1, 51);softPwmWrite(6, 0);softPwmWrite(5, 51);
+#define MOTOR_GO_FORWARD   softPwmWrite(4, 0);softPwmWrite(1, 21);softPwmWrite(6, 0);softPwmWrite(5, 21);
 //#define MOTOR_GO_BACK	   digitalWrite(4,HIGH);digitalWrite(1,LOW);digitalWrite(6,HIGH);digitalWrite(5,LOW)
-#define MOTOR_GO_RIGHT	  softPwmWrite(1, 51);softPwmWrite(4, 0);softPwmWrite(5, 0);softPwmWrite(6, 51);
-#define MOTOR_GO_LEFT	   softPwmWrite(4, 51);softPwmWrite(1, 0);softPwmWrite(5, 51);softPwmWrite(6, 0);
+#define MOTOR_GO_RIGHT	  softPwmWrite(1, 21);softPwmWrite(4, 0);softPwmWrite(5, 0);softPwmWrite(6, 21);
+#define MOTOR_GO_LEFT	   softPwmWrite(4, 21);softPwmWrite(1, 0);softPwmWrite(5, 21);softPwmWrite(6, 0);
 #define MOTOR_GO_STOP	   	softPwmWrite(1, 0); softPwmWrite(4, 0);softPwmWrite(5, 0);softPwmWrite(6, 0);
 
 int main(int argc, char *argv[])

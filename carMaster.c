@@ -15,14 +15,15 @@
 #include <wiringPi.h>
 
 #define BUFSIZE 5 //缓冲区大小
-#define RIGHT 26 //传感器output接在GPIO.26
+#define OBSTACLE 26 //传感器output接在GPIO.26
 
 //通过定义四个电机的状态定义小车状态
-#define MOTOR_GO_FORWARD   softPwmWrite(4, 0);softPwmWrite(1, 51);softPwmWrite(6, 0);softPwmWrite(5, 51);
+#define MOTOR_GO_FORWARD   softPwmWrite(4, 0);softPwmWrite(1, 21);softPwmWrite(6, 0);softPwmWrite(5, 21)
 //#define MOTOR_GO_BACK	   digitalWrite(4,HIGH);digitalWrite(1,LOW);digitalWrite(6,HIGH);digitalWrite(5,LOW)
-#define MOTOR_GO_RIGHT	  softPwmWrite(1, 51);softPwmWrite(4, 0);softPwmWrite(5, 0);softPwmWrite(6, 51);
-#define MOTOR_GO_LEFT	   softPwmWrite(4, 51);softPwmWrite(1, 0);softPwmWrite(5, 51);softPwmWrite(6, 0);
-#define MOTOR_GO_STOP	   	softPwmWrite(1, 0); softPwmWrite(4, 0);softPwmWrite(5, 0);softPwmWrite(6, 0);
+#define MOTOR_GO_RIGHT	  softPwmWrite(1, 21);softPwmWrite(4, 0);softPwmWrite(5, 0);softPwmWrite(6, 21)
+#define MOTOR_GO_LEFT	   softPwmWrite(4, 21);softPwmWrite(1, 0);softPwmWrite(5, 21);softPwmWrite(6, 0)
+#define MOTOR_GO_STOP	   	softPwmWrite(1, 0); softPwmWrite(4, 0);softPwmWrite(5, 0);softPwmWrite(6, 0)
+
 
 int main(int argc, char *argv[])
 {
@@ -42,7 +43,6 @@ int main(int argc, char *argv[])
 	pinMode(4, OUTPUT);	//IN2
 	pinMode(5, OUTPUT);	//IN3
 	pinMode(6, OUTPUT);	//IN4
-	pinMode(26, INPUT);
 
 	/*Init output*/
 	softPwmCreate(1, 1, 100);
@@ -85,19 +85,18 @@ int main(int argc, char *argv[])
 	char backbuf[BUFSIZE]; //定义并初始化写空间
 	memset(buf, 0, BUFSIZE);
 	memset(backbuf, 0, BUFSIZE);
-    int obstacleFlag=0;//定义状态接收传感器输出状态
+    	int obstacleFlag=0;//定义状态接收传感器输出状态
 	int obstacle;
 	fcntl(sockfd,F_SETFL,fcntl(sockfd,F_GETFL,0)|O_NONBLOCK);//将套接字设置为非阻塞模式
 	while (1)
 	{	
 	//小车遇到障碍，GPIO.26输出低电平，头车将状态返回给服务器
-	if (obstacleFlag = 0)
+	if (obstacleFlag == 0)
 	{
-		obstacle = digitalRead(RIGHT);
+		obstacle = digitalRead(OBSTACLE);
 		if (obstacle == LOW)
 		{
-			obstacleFlag = 2;
-			MOTOR_GO_STOP;
+			obstacleFlag = 3;
 			printf("obstacle\n"); 
 			backbuf[1] = 0x05;
 			write(sockfd, backbuf, 5);
